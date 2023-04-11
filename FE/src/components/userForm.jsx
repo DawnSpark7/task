@@ -1,17 +1,17 @@
 import React,{useState, useEffect} from 'react'
-import { UsersService } from '../services/users-service';
+import { booksService } from '../services/users-service';
 export default function UserForm({ userData }) {
 
   const [name, setname] = useState('');
-  const [email, setemail] = useState('');
-  const [password, setpassword] = useState('');
+  const [author, setauthor] = useState('');
+  const [qty, setqty] = useState('');
   const [error, seterror] = useState('');
 
   useEffect(() => {
 
     if(userData) {
       setname(userData.name);
-      setemail(userData.email);
+      setauthor(userData.author);
     }
 
   }, []);
@@ -20,12 +20,12 @@ export default function UserForm({ userData }) {
 
     const payload = {
       name,
-      email,
-      password
+      author,
+      qty
     }
 
     if(userData) {
-      UsersService.updateUser(userData._id)
+      booksService.updateBook(userData._id)
       .then(res => {
         if(res.status) {
           alert('Successful');
@@ -33,7 +33,7 @@ export default function UserForm({ userData }) {
         }
       })
     } else {
-      UsersService.addUser(payload)
+      booksService.addBook(payload)
       .then(res => {
         if(res.status) {
           alert('Successful');
@@ -50,9 +50,9 @@ export default function UserForm({ userData }) {
           e.preventDefault();
           submitForm();
         }}>
-          <input type="text" value={name} placeholder="Enter name" onChange={(e) => setname(e.target.value)} required /> <br/>
-          <input type="email" value={email} placeholder="Enter email address" onChange={(e) => setemail(e.target.value)} required /> <br/>
-          <input type="password" placeholder='Enter password' onChange={(e) => setpassword(e.target.value)} required /><br />
+          <input type="text" placeholder="Enter name" onChange={(e) => setname(e.target.value)} required /> <br/>
+          <input type="text" placeholder="Enter author" onChange={(e) => setauthor(e.target.value)} required /> <br/>
+          <input type="text" placeholder='Enter quantity' onChange={(e) => setqty(e.target.value)} required /><br />
           <p style={{ display: `${error} ? 'block' : 'none'` }}>{error}</p>
           <input type="submit" value="submit" /> &nbsp;
           <input type="reset" value="reset" onClick={() => seterror('')}/>

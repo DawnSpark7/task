@@ -1,12 +1,47 @@
 import { generateHeaders } from "./helpers";
-export const UsersService = {
-    getUsers,
-    addUser,
-    updateUser,
-    deleteUser,
+export const booksService = {
+    getBooks,
+    addBook,
+    updateBook,
+    borrowBook,
+    getBorrowedDetails
 }
 
-async function getUsers(payload) {
+async function borrowBook(payload) {
+
+    const requestOptions = {
+        method: 'POST',
+        headers: generateHeaders(),
+        body: JSON.stringify(payload)
+    }
+
+    try {
+        const result = await fetch('http://localhost:3000/borrowBook', requestOptions);
+        return result.json();
+    } catch(e) {
+        return e;
+    }
+
+}
+
+async function getBorrowedDetails(payload) {
+
+    const requestOptions = {
+        method: 'POST',
+        headers: generateHeaders(),
+        body: JSON.stringify(payload)
+    }
+
+    try {
+        const result = await fetch('http://localhost:3000/getBorrowDetails', requestOptions);
+        return result.json();
+    } catch(e) {
+        return e;
+    }
+
+}
+
+async function getBooks(payload) {
 
     const requestOptions = {
         method: 'POST',
@@ -24,7 +59,7 @@ async function getUsers(payload) {
 
 }
 
-async function addUser(payload) {
+async function addBook(payload) {
 
     const requestOptions = {
         method: 'POST',
@@ -42,7 +77,7 @@ async function addUser(payload) {
 
 }
 
-async function updateUser(payload) {
+async function updateBook(payload) {
 
     const requestOptions = {
         method: 'POST',
@@ -60,7 +95,7 @@ async function updateUser(payload) {
 
 }
 
-async function deleteUser(id) {
+async function deleteBook(id) {
 
     const requestOptions = {
         method: 'DELETE',

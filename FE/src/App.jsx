@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import Users from './components/Users';
+import Books from './components/Books';
 import Login from './components/Login';
 import './App.css';
 import {
@@ -29,11 +29,11 @@ function App() {
           path="/"
           element={
                 isAuthenticated ?
-                <Users /> :
+                <Books /> :
                 <Login /> 
           }
         />
-        <Route path="/users" element={<Users />} /> 
+        <Route path="/books" element={<Books />} /> 
         <Route path="/login" element={<Login />}/>
       </Routes>
     </BrowserRouter>

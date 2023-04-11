@@ -7,7 +7,7 @@ const app = express();
 const cors = require('cors')
 const port = 3000;
 
-const { Users, Admin } = require("./models");
+const { Books, Admin } = require("./models");
 const { validateJWTToken } = require("./utils");
 const corsOptions = {
   origin: '*',
@@ -37,20 +37,6 @@ mongoose
     console.log(error);
   });
 
-// Reading a Userdata from MongoDB
-app.get("/:id", (req, res) => {
-  validateJWTToken(token).then((response) => {
-    if (response.status) {
-      Users.findById(req.params.id, ({ user }) => res.send(user));
-    } else {
-      res.send({
-        status: 0,
-        message: response.message,
-      });
-    }
-  });
-});
-
 // Route for handling the login form submission
 app.post("/login", async (req, res) => {
   const { email, password } = req.body;
@@ -77,6 +63,7 @@ app.post("/login", async (req, res) => {
     message: "Successful Login",
     data: {
       token,
+      email: admin.email
     },
   });
 });
@@ -88,11 +75,105 @@ app.post("/getAllUsers", (req, res) => {
   validateJWTToken(token).then((response) => {
     if (response.status) {
       // Retrieve all users from the database
-      Users.find()
+      Books.find()
         .then((userdata) => res.send({
           status: 1,
           data: userdata
         }))
+        .catch((err) => res.send(err));
+    } else {
+      res.send({
+        status: 0,
+        message: {message: response.message},
+      });
+    }
+  });
+});
+
+app.post("/borrowBook", (req, res) => {
+  const authHeader = req.headers["authorization"];
+  const token = authHeader && authHeader.split(" ")[1];
+  const {id, email} = req.body;
+  validateJWTToken(token).then((resp) => {
+    if (resp.status) {
+      // Retrieve all users from the database
+      Books.findById(id)
+        .then((bookdata) => {
+          // console.log("Previous ", bookdata);
+
+          if(bookdata) {
+            
+            Admin.findOne({ email })
+            .then(user => {
+
+              if (user) {
+                const newData = user.borrowedBooks.bookIds
+                const newCount = user.borrowedBooks.count + 1;
+                newData.push(bookdata._id)
+
+                const update = {
+                  $set: {
+                    borrowedBooks: {
+                      count: newCount,
+                      bookIds: newData,
+                    },
+                  },
+                };
+  
+                Admin.updateOne({ email }, update)
+                .then(user => {
+                   if(user.acknowledged) {
+                      const newQty = bookdata.qty - 1;
+                      const update = {
+                        $set: {
+                          qty: newQty
+                        },
+                      };
+
+                      Books.findByIdAndUpdate(id, update)
+                      .then(book => {
+                        if(book) {
+                          res.send({
+                            status: 1,
+                            message: 'Success'
+                          })
+                        }
+                      })
+                   }
+                });
+              } else {
+                throw new Error('User not found');
+              }
+            })
+
+          }
+
+        })
+        .catch((err) => res.send(err));
+    } else {
+      res.send({
+        status: 0,
+        message: {message: response.message},
+      });
+    }
+  });
+});
+
+app.post("/getBorrowDetails", (req, res) => {
+  const authHeader = req.headers["authorization"];
+  const token = authHeader && authHeader.split(" ")[1];
+  const { email } = req.body;
+
+  validateJWTToken(token).then((response) => {
+    if (response.status) {
+      // Retrieve all users from the database
+      Admin.findOne({ email })
+        .then((userdata) => {
+            res.send({
+            status: 1,
+            data: userdata?.borrowedBooks
+          })
+        })
         .catch((err) => res.send(err));
     } else {
       res.send({
@@ -113,7 +194,7 @@ app.post("/addUser", (req, res) => {
   password = req.body.password;
 
   try {
-    let newUser = new Users({
+    let newUser = new Books({
       name: fullname,
       email: email,
       password: password,

@@ -18,7 +18,8 @@ export default function Login() {
       
       if(res.status) {
         localStorage.setItem('token', res.data?.token)
-        navigate('/users')
+        localStorage.setItem('userEmail', res.data?.email)
+        navigate('/books')
       } else {
         seterror(res.message)
       }
