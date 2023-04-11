@@ -1,6 +1,5 @@
 import React, {useState, useEffect} from 'react'
 import { booksService } from '../services/users-service'
-import UserForm from './userForm';
 import {
   Link,
   useNavigate,
@@ -8,8 +7,6 @@ import {
 export default function Books() {
   const navigate = useNavigate();
   const [booksList, setbooksList] = useState([]);
-  const [userData, setuserData] = useState(null);
-  const [isAddEditUser, setisAddEditUser] = useState(false);
   const [borrowDetails, setborrowDetails] = useState(null)
   const userEmail = localStorage.getItem('userEmail');
   const logout = () => {
@@ -50,12 +47,8 @@ export default function Books() {
       <section>
         <h1>Books</h1>
         <h5>Current Borrowed Books: {borrowDetails?.count}</h5>
-        {!isAddEditUser && <button onClick={() => updateUser(null)}>Add</button>} &nbsp;
         <Link to="/login"><button onClick={logout} style={{ 'backgroundColor': 'grey' }}>Logout</button></Link>
       </section>
-      {isAddEditUser ? 
-        <UserForm userData={userData} />
-        :
         <section style={{ 'textAlign': 'left' }}>
           <table>
             <thead>
@@ -88,7 +81,6 @@ export default function Books() {
             </tbody>
           </table>
         </section>
-      }
     </div>
   )
 }

@@ -9,16 +9,16 @@ const validateJWTToken = async (token) => {
       };
     }
   
-    const result = await jwt.verify(token, 'Test#Secret@123', (err, user) => {
+    const result = jwt.verify(token, 'Test#Secret@123', (err, user) => {
       if (err) {
         return {
-            status: 0,
-            message: 'Token Expired'
+          status: 0,
+          message: 'Token Expired'
         };
       } else {
         return {
-            status: 1,
-            message: 'Valid Token'
+          status: 1,
+          message: 'Valid Token'
         };
       }
     });
